@@ -1,0 +1,22 @@
+{
+  "name": "natours",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shahed1998/Natours.git"
+  },
+  "author": "shahed",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shahed1998/Natours/issues"
+  },
+  "homepage": "https://github.com/Shahed1998/Natours#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
