@@ -1,14 +1,18 @@
 const express = require('express');
 const app = express();
 const fs = require('fs');
+const morgan = require('morgan');
 const port = 3000;
 
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf-8')
 );
 
-app.use(express.json()); // middleware
+// middleware
+app.use(express.json());
+app.use(morgan('dev'));
 
+// Get all tours
 app.get('/api/v1/tours', (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -17,6 +21,7 @@ app.get('/api/v1/tours', (req, res) => {
   });
 });
 
+// Get tours by id
 app.get('/api/v1/tours/:id', (req, res) => {
   const id = req.params.id * 1;
   const tour = tours.find((el) => el.id === id);
@@ -34,9 +39,28 @@ app.get('/api/v1/tours/:id', (req, res) => {
   }
 });
 
+// add tour
 app.post('/api/v1/tours', (req, res) => {
-  console.log(req.body);
-  res.send('done');
+  res.status(201).json({
+    status: 'success',
+    data: '',
+  });
+});
+
+// update tour
+app.patch((req, res) => {
+  res.status(200).json({
+    status: 'success',
+    data: '',
+  });
+});
+
+// delete tour
+app.delete((req, res) => {
+  res.status(204).json({
+    status: 'successful',
+    data: null,
+  });
 });
 
 app.listen(port, () => {
