@@ -2,6 +2,13 @@ const express = require('express');
 const router = express.Router();
 const tourController = require('../controllers/tourController');
 
-router.route('/api/v1/tours').get(tourController.getAllTours);
+router.param('id', tourController.checkID);
+
+router
+  .route('/')
+  .get(tourController.getAllTours)
+  .post(tourController.checkBody, tourController.addTour); // chaining middleware
+
+router.route('/:id').get(tourController.getAllTours);
 
 module.exports = router;
