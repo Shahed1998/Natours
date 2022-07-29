@@ -1,6 +1,6 @@
 // Server
-require('dotenv').config();
 const mongoose = require('mongoose');
+require('dotenv').config();
 const app = require('./app');
 
 // Database connection
@@ -18,29 +18,6 @@ const app = require('./app');
     process.stdout.write(`${err}\n`);
   }
 })();
-
-// Schema
-const tourSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'A tour must have a name'],
-    unique: true,
-  },
-  price: {
-    type: Number,
-    required: [true, 'A tour must have a price'],
-  },
-  rating: {
-    type: Number,
-    default: 4.5,
-  },
-});
-
-const Tour = mongoose.model('Tour', tourSchema);
-const testTour = new Tour({
-  name: 'Saint Martin',
-  price: 123,
-});
 
 // testTour
 //   .save()
