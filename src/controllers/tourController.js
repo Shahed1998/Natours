@@ -19,7 +19,20 @@ exports.addTour = async (req, res) => {
 // Get all tours
 exports.getAllTours = async (req, res) => {
   try {
-    const allTours = await Tour.find();
+    // Hard copy of query object is needed
+    // because in javascript object assignment keeps the reference of the object
+    // To hard copy : use destructuring + assign object
+    const queryObj = { ...req.query };
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach((el) => delete queryObj[el]);
+
+    // Building query
+    const query = Tour.find(queryObj);
+
+    // Executing query
+    const allTours = await query;
+
+    // Sending response
     res.status(200).json({
       status: 'success',
       results: allTours.length,
