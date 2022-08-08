@@ -22,12 +22,37 @@ exports.getAllTours = async (req, res) => {
     // Hard copy of query object is needed
     // because in javascript object assignment keeps the reference of the object
     // To hard copy : use destructuring + assign object
+    // 1a. Filtering
     const queryObj = { ...req.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
 
+    // 1b. Advance filtering
+    let queryStr = JSON.stringify(queryObj);
+    //  \b: match exactly, g: all instances, regex: /()/, |: or
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    queryStr = JSON.parse(queryStr);
+
     // Building query
-    const query = Tour.find(queryObj);
+    const query = Tour.find(queryStr);
+
+    // 2. Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query.sort(sortBy);
+    } else {
+      // sort by desc using negative sign
+      // gets newer results first
+      query.sort('-createdAt');
+    }
+
+    // 3) Field limiting
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query.select(fields);
+    } else {
+      query.select('-__v'); // minus represents excluding
+    }
 
     // Executing query
     const allTours = await query;
