@@ -16,6 +16,14 @@ exports.addTour = async (req, res) => {
   }
 };
 
+// Middleware: alias tour
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = 2;
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
+};
+
 // Get all tours
 exports.getAllTours = async (req, res) => {
   try {
@@ -53,6 +61,16 @@ exports.getAllTours = async (req, res) => {
     } else {
       query.select('-__v'); // minus represents excluding
     }
+
+    // 4) Pagination
+    const page = req.query.page * 1 || 1;
+    const size = req.query.limit * 1 || 3;
+    const skip = (page - 1) * size;
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if (skip >= numTours) throw new Error('This page does not exist');
+    }
+    query.skip(skip).limit(size);
 
     // Executing query
     const allTours = await query;
