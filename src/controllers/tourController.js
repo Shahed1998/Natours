@@ -1,4 +1,5 @@
 const Tour = require('../models/tourModel');
+const ApiFeatures = require('../utils/ApiFeatures');
 
 // Create a tour
 exports.addTour = async (req, res) => {
@@ -18,7 +19,7 @@ exports.addTour = async (req, res) => {
 
 // Middleware: alias tour
 exports.aliasTopTours = (req, res, next) => {
-  req.query.limit = 2;
+  req.query.limit = 5;
   req.query.sort = '-ratingsAverage,price';
   req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
   next();
@@ -27,53 +28,14 @@ exports.aliasTopTours = (req, res, next) => {
 // Get all tours
 exports.getAllTours = async (req, res) => {
   try {
-    // Hard copy of query object is needed
-    // because in javascript object assignment keeps the reference of the object
-    // To hard copy : use destructuring + assign object
-    // 1a. Filtering
-    const queryObj = { ...req.query };
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
-    excludedFields.forEach((el) => delete queryObj[el]);
-
-    // 1b. Advance filtering
-    let queryStr = JSON.stringify(queryObj);
-    //  \b: match exactly, g: all instances, regex: /()/, |: or
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-    queryStr = JSON.parse(queryStr);
-
-    // Building query
-    const query = Tour.find(queryStr);
-
-    // 2. Sorting
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ');
-      query.sort(sortBy);
-    } else {
-      // sort by desc using negative sign
-      // gets newer results first
-      query.sort('-createdAt');
-    }
-
-    // 3) Field limiting
-    if (req.query.fields) {
-      const fields = req.query.fields.split(',').join(' ');
-      query.select(fields);
-    } else {
-      query.select('-__v'); // minus represents excluding
-    }
-
-    // 4) Pagination
-    const page = req.query.page * 1 || 1;
-    const size = req.query.limit * 1 || 3;
-    const skip = (page - 1) * size;
-    if (req.query.page) {
-      const numTours = await Tour.countDocuments();
-      if (skip >= numTours) throw new Error('This page does not exist');
-    }
-    query.skip(skip).limit(size);
-
     // Executing query
-    const allTours = await query;
+    const features = new ApiFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limit()
+      .paginate();
+
+    const allTours = await features.query;
 
     // Sending response
     res.status(200).json({
