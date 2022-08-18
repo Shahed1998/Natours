@@ -103,3 +103,39 @@ exports.deleteTour = async (req, res) => {
     });
   }
 };
+
+// Get tour statistics
+// Aggregate method works in stages
+exports.getTourStats = async (req, res) => {
+  try {
+    const stat = await Tour.aggregate([
+      { $match: { ratingsAverage: { $gte: 4.5 } } },
+      {
+        $group: {
+          // _id: '$ratingsAverage', // gives data for all the tours
+          _id: '$difficulty',
+          numTours: { $sum: 1 },
+          numRatings: { $sum: '$ratingsQuantity' },
+          avgRating: { $avg: '$ratingsAverage' }, // field names in $field_name
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+      {
+        $sort: { avgPrice: 1 }, // have to use group name
+      },
+      // { $match: { _id: { $ne: 'easy' } } }, // we can match multiple times
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      data: { stat },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
