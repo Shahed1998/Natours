@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 // Schema
 const tourSchema = new mongoose.Schema(
@@ -9,6 +10,7 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    slug: String,
     duration: {
       type: Number,
       required: [true, 'A duration is required'],
@@ -56,6 +58,10 @@ const tourSchema = new mongoose.Schema(
       select: false, // doesn't show to the user
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -67,6 +73,27 @@ const tourSchema = new mongoose.Schema(
 // doesn't need to be stored in db
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
+});
+
+// Mongoose middleware
+// Document middleware
+// pre: runs before saving data to document
+tourSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
+
+// post: runs after saving data to document
+// tourSchema.post('save', (doc, next) => {
+//   console.log(doc);
+//   next();
+// });
+
+// Query middleware
+// Executing for any query starting with find
+tourSchema.pre(/^find/, function (next) {
+  this.find({ secretTour: { $ne: true } });
+  next();
 });
 
 // Model
