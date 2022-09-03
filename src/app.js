@@ -15,4 +15,13 @@ app.use(express.static(`${__dirname}/public`)); // serve static files
 // Tour middleware
 app.use('/api/v1/tours', tourRouter);
 
+// Error route
+// eslint-disable-next-line no-unused-vars
+app.all('*', (req, res) => {
+  res.status(404).json({
+    status: 'fail',
+    message: `Can't find ${req.originalUrl} on this server`,
+  });
+});
+
 module.exports = app;

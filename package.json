@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon ./src",
-    "prod": "SET NODE_ENV=production & node ./src"
+    "prod": "SET NODE_ENV=production & node ./src",
+    "debug": "ndb ./src/index.js"
   },
   "repository": {
     "type": "git",
