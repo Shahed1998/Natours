@@ -1,6 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
 const tourRouter = require('./routes/tourRoutes');
+const AppError = require('./utils/AppError');
+const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
 
@@ -17,11 +19,12 @@ app.use('/api/v1/tours', tourRouter);
 
 // Error route
 // eslint-disable-next-line no-unused-vars
-app.all('*', (req, res) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `Can't find ${req.originalUrl} on this server`,
-  });
+app.all('*', (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
+
+// Global error handling middleware
+// It takes 4 parameters (err, req, res, next)
+app.use(globalErrorHandler);
 
 module.exports = app;
