@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 // const validator = require('validator');
@@ -117,7 +118,6 @@ tourSchema.pre(/^find/, function (next) {
 // eslint-disable-next-line prefer-arrow-callback
 tourSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  console.log(this);
   next();
 });
 

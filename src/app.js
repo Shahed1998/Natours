@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const tourRouter = require('./routes/tourRoutes');
+const userRouter = require('./routes/userRoutes');
 const AppError = require('./utils/AppError');
 const globalErrorHandler = require('./controllers/errorController');
 
@@ -16,6 +17,9 @@ app.use(express.static(`${__dirname}/public`)); // serve static files
 
 // Tour middleware
 app.use('/api/v1/tours', tourRouter);
+
+// User middleware
+app.use('/api/v1/users', userRouter);
 
 // Error route
 // eslint-disable-next-line no-unused-vars
