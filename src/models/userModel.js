@@ -1,3 +1,4 @@
+/* eslint-disable no-return-await */
 /* eslint-disable consistent-return */
 /* eslint-disable prefer-arrow-callback */
 /* eslint-disable object-shorthand */
@@ -28,6 +29,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 8,
+    select: false,
   },
   passwordConfirm: {
     type: String,
@@ -50,6 +52,15 @@ userSchema.pre('save', async function (next) {
   this.passwordConfirm = undefined;
   next();
 });
+
+// instance method
+// verify password
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword,
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 // model
 const User = mongoose.model('User', userSchema);
