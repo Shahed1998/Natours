@@ -14,6 +14,10 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use(express.json()); // gives access to request body
 app.use(express.static(`${__dirname}/public`)); // serve static files
+app.use((req, res, next) => {
+  // console.log(req.headers);
+  next();
+});
 
 // Tour middleware
 app.use('/api/v1/tours', tourRouter);

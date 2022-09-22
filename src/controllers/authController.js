@@ -52,3 +52,23 @@ exports.login = catchAsync(async (req, res, next) => {
     token,
   });
 });
+
+// Protected routes
+exports.protect = catchAsync(async (req, res, next) => {
+  // 1) get token and check if it's there
+  let token;
+  if (
+    // eslint-disable-next-line operator-linebreak
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    [, token] = req.headers.authorization.split(' ');
+  }
+  // 2) verify token
+  if (!token) {
+    return next(new AppError('You are not logged in', 401));
+  }
+  // 3) check if user still exist
+  // 4) check if user changed password after token was issued
+  next();
+});
